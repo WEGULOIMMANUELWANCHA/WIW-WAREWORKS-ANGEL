@@ -1,0 +1,30 @@
+name: Import Code from External Repository
+
+on:
+  workflow_dispatch:
+    inputs:
+      external_repository:
+        description: 'External Repository URL'
+        required: true
+
+jobs:
+  import_code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Create Directories
+        run: |
+          external_repository=${{ github.event.inputs.external_repository }}
+
+          mkdir -p "Holy Books"
+          mkdir -p "Holy Books/bibles"
+
+          git clone --depth 1 $external_repository "Holy Books/bibles"
+
+          git add "Holy Books"
+          git commit -m "Import code from $external_repository"
+          git push
+        working-directory: ${{ github.workspace }}
