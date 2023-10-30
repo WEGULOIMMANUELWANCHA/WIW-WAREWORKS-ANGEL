@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       external_repository:
-        description: 'External Repository URL'
+        description: 'https://github.com/WEGULOIMMANUELWANCHA/Holy-Bible-XML-Format'
         required: true
 
 jobs:
@@ -14,7 +14,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
+        with: 
+          node-version: 16
+          
       - name: Create Directories
         run: |
           external_repository=${{ github.event.inputs.external_repository }}
