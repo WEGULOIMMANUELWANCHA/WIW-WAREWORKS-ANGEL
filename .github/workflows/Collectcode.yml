@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       external_repository:
-        description: 'https://github.com/WEGULOIMMANUELWANCHA/Holy-Bible-XML-Format'
+        description: 'External Repository URL'
         required: true
 
 jobs:
@@ -12,11 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
       - name: Checkout Code
         uses: actions/checkout@v2
-        with: 
-          node-version: 16
-          
+
       - name: Create Directories
         run: |
           external_repository=${{ github.event.inputs.external_repository }}
@@ -30,3 +33,4 @@ jobs:
           git commit -m "Import code from $external_repository"
           git push
         working-directory: ${{ github.workspace }}
+
