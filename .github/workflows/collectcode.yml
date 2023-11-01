@@ -23,7 +23,7 @@ jobs:
       - name: Create Directories
         run: |
           external_repository=${{ github.event.inputs.external_repository }}
-          pat=${{ GIT_PAT }}
+          pat=${{ secrets.GIT_PAT }}
 
           mkdir -p "Holy Books"
           mkdir -p "Holy Books/bibles"
