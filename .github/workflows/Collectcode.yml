@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       external_repository:
-        description: 'External Repository URL'
+        description: 'https://github.com/WEGULOIMMANUELWANCHA/Holy-Bible-XML-Format'
         required: true
 
 jobs:
