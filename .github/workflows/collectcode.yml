@@ -1,4 +1,4 @@
-name: Import Code from External Repository
+name: Import Code and Set Up Directories
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  import_code:
+  import_and_setup:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +23,15 @@ jobs:
       - name: Create Directories
         run: |
           external_repository=${{ github.event.inputs.external_repository }}
+          pat=${{ GIT_PAT }}
 
           mkdir -p "Holy Books"
           mkdir -p "Holy Books/bibles"
+
+          git config --global user.name "EmmanuelMaisoWancha"
+          git config --global user.email "weguloimmanuelwancha@gmail.com"  
+          git config --global credential.helper store
+          git config --global --add http.extraheader "AUTHORIZATION: bearer $pat"
 
           git clone --depth 1 $external_repository "Holy Books/bibles"
 
@@ -33,4 +39,3 @@ jobs:
           git commit -m "Import code from $external_repository"
           git push
         working-directory: ${{ github.workspace }}
-
