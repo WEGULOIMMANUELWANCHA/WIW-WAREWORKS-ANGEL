@@ -1,0 +1,96 @@
+name: Build and Deploy Repositories
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+  - name: Install Bazel
+        run: |
+          sudo apt update
+          sudo apt install -y apt-transport-https curl gnupg
+          curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor -o /usr/share/keyrings/bazel-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+          sudo apt update
+          sudo apt install -y bazel
+          bazel version
+        shell: bash
+
+    
+      - name: Set up Bazel
+        run: |
+          # Install Bazel
+          curl -sS https://bazel.build/bazelisk | bash
+
+          # Initialize Bazel
+          bazel version  # Check version for verification
+
+          # Set Bazel and start build
+          bazel build //...# Replace with your specific build target
+        
+- name: Fetch Repository List
+   run: |
+      bazel fetch //...
+    while IFS= read -r repo; do
+      git clone $repo
+      repo_name=$(basename $repo .git)
+      cd $repo_name
+    
+      Fetch Repository List
+        run: |
+          # Fetch the list of repositories to build from a text file (repository_list.txt)
+          curl -o repository.txt https://example.com/repository.txt
+  
+      
+- name : Build Binaries 
+    run: |
+      bazel build //...
+
+      # Build binaries using Bazel (adjust commands as needed)
+      bazel build //...
+
+      # Add additional steps specific to your project
+
+      cd ..
+      rm -rf $repo_name
+    done < repository_list.txt
+  shell: bash
+
+
+     - name: Loop Through Repositories and Build Binaries
+        run: |
+          while IFS= read -r repo; do
+            # Clone the repository
+            git clone $repo
+            repo_name=$(basename $repo .git)
+            cd $repo_name
+
+            # Build binaries using Bazel (adjust commands as needed)
+            bazel build//... ./Google\ Bazel/Workspace/to/target_name  # Adjust as per your folder structure
+
+            # Additional steps specific to your project
+            # Navigate dynamically using relative paths or predefined variables
+            # Example: Copy built artifacts to Github Release folder
+            cp -r ./path/to/built/artifacts ../Github\ Release/
+
+            cd ..
+            rm -rf $repo_name
+          done < Github\ Repositories/repository_list.txt
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./Github\ Pages/ Documents/Index.md # Path to publish directory for GitHub Pages
+
+      - name: Store Artifacts as Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./Github\ Release/ Artifacts/Artifacts@v1.0.0# Path to artifacts for GitHub Release
+    
