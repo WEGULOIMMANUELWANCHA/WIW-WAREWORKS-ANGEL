@@ -1,1 +1,62 @@
+name: Build and Deploy Repositories
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+- name: Fetch Repository List
+   run: |
+    while IFS= read -r repo; do
+      git clone $repo
+      repo_name=$(basename $repo .git)
+      cd $repo_name
+
+      # Build binaries using Bazel (adjust commands as needed)
+      bazel build //path/to:target_name
+
+      # Add additional steps specific to your project
+
+      cd ..
+      rm -rf $repo_name
+    done < repository_list.txt
+  shell: bash
+
+
+      - name: Loop Through Repositories and Build Binaries
+        run: |
+          while IFS= read -r repo; do
+            # Clone the repository
+            git clone $repo
+            repo_name=$(basename $repo .git)
+            cd $repo_name
+
+            # Build binaries using Bazel (adjust commands as needed)
+            bazel build ./Google\ Bazel/path/to/target_name  # Adjust as per your folder structure
+
+            # Additional steps specific to your project
+            # Navigate dynamically using relative paths or predefined variables
+            # Example: Copy built artifacts to Github Release folder
+            cp -r ./path/to/built/artifacts ../Github\ Release/
+
+            cd ..
+            rm -rf $repo_name
+          done < Github\ Repositories/repository_list.txt
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./Github\ Pages  # Path to publish directory for GitHub Pages
+
+      - name: Store Artifacts as Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./Github\ Release/*  # Path to artifacts for GitHub Release
 
