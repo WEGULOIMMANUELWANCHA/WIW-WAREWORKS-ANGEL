@@ -1,7 +1,7 @@
 name: Build and Deploy Repositories
-
-on:
-  workflow_dispatch:
+trigger:
+      on:
+         workflow_dispatch:
 
 jobs:
   build_and_deploy:
@@ -9,9 +9,8 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        
-  - name: Install Bazel
+        uses: actions/checkout@v3    
+      - name: Install Bazel
         run: |
           sudo apt update
           sudo apt install -y apt-transport-https curl gnupg
@@ -21,8 +20,7 @@ jobs:
           sudo apt install -y bazel
           bazel version
         shell: bash
-
-    
+      
       - name: Set up Bazel
         run: |
           # Install Bazel
@@ -33,22 +31,43 @@ jobs:
 
           # Set Bazel and start build
           bazel build //...# Replace with your specific build target
-        
-- name: Fetch Repository List
-   run: |
-      bazel fetch //...
-    while IFS= read -r repo; do
-      git clone $repo
-      repo_name=$(basename $repo .git)
-      cd $repo_name
-    
-      Fetch Repository List
-        run: |
-          # Fetch the list of repositories to build from a text file (repository_list.txt)
-          curl -o repository.txt https://example.com/repository.txt
+          steps:
+          - name: Read repositories file
+             run: |
+                repository_data=$(cat repositories.txt)
+
+          - name: Parse repository information
+             run: |
+           repositories_list=$(echo $repository_data | jq '.repositories')
+           for repository in $(echo $repositories_list); do
+           repository_name=$(echo $repository | jq '.name')
+           repository_url=$(echo $repository | jq '.url')
+           repository_build_path=$(echo $repository | jq '.buildPath')
+
+           echo "Repository Name: $repository_name"
+           echo "Repository URL: $repository_url"
+           echo "Repository Build Path: $repository_build_path"
+
+        # Add the extracted information to the repositories section of the workflow
+     
+          - name: $repository_name
+             url: $repository_url
+            path: $repository_build_path
+             run: bazel build //:my_binary
+         
+      - name: Fetch Repository List
+         run: |
+          bazel fetch //...
+          while IFS= read -r repo; do
+          git clone $repo
+          repo_name=$(basename $repo .git)
+          cd $repo_name
   
-      
-- name : Build Binaries 
+   - name:Fetch Repository List: 
+      run: |
+          # Fetch the list of repositories to build from a text file (repository_list.txt)
+       curl -o repository.txt https://example.com/repository.txt
+  - name : Build Binaries 
     run: |
       bazel build //...
 
@@ -58,13 +77,10 @@ jobs:
       # Add additional steps specific to your project
 
       cd ..
-      rm -rf $repo_name
-    done < repository_list.txt
-  shell: bash
-
-
-     - name: Loop Through Repositories and Build Binaries
-        run: |
+      rm -rf $repo_name done < repository_list.txt
+      shell: bash
+       - name: Loop Through Repositories and Build Binaries
+          run: |
           while IFS= read -r repo; do
             # Clone the repository
             git clone $repo
