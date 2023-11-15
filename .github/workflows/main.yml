@@ -21,18 +21,7 @@ jobs:
           sudo apt install -y bazel
           bazel version
         shell: bash
-
-      - name: Set up Bazel
-        run: |
-          # Install Bazel
-          curl -sS https://bazel.build/bazelisk | bash
-
-          # Initialize Bazel
-          bazel version  # Check version for verification
-
-          # Set Bazel and start build
-          bazel build //... # Replace with your specific build target
-
+          
       - name: Fetch Repository List
         run: |
           # Fetch the list of repositories to build from a text file (repositories.txt)
