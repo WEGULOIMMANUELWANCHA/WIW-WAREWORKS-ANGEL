@@ -25,7 +25,7 @@ jobs:
       - name: Fetch Repository List
         run: |
           # Fetch the list of repositories to build from a text file (repositories.txt)
-          cat GithubRepositories/Repositories/Repositories.txt > repository_list.txt
+          cat Github Repositories/Repositories/Repositories.txt > repository_list.txt
 
       - name: Build Binaries 
         run: |
