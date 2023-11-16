@@ -24,23 +24,43 @@ jobs:
           
       - name: Fetch Repository List
         run: |
-          # Fetch the list of repositories to build from a text file (repositories.txt)
-          cat Github Repositories/Repositories/Repositories.txt > repository_list.txt
+          # Fetch the list of repositories to build from a text file (Repositories.txt)
+          while IFS= read -r repo; do
+            git clone "$repo"
+          done < GithubRepositories/Repositories/Repositories.txt
+        shell: bash
 
       - name: Build Binaries 
         run: |
           # Loop through the repository list file and perform actions for each repository
           while IFS= read -r repo; do
-            git clone $repo
-            repo_name=$(basename $repo .git)
-            cd $repo_name
-
+            repo_name=$(basename "$repo" .git)
+            cd "$repo_name" || continue  # Continue to the next repository if CD fails
+            
             # Build binaries using Bazel or any other necessary commands
-            # ...
-
+            bazel build //...  # Adjust this command according to your specific build targets
+            
+            # Error handling and debugging
+            if [ $? -ne 0 ]; then
+              echo "Error building $repo_name"
+              # Add more error handling or debugging steps as needed
+            fi
+            
             cd ..
-            rm -rf $repo_name
-          done < repository_list.txt
+            rm -rf "$repo_name"
+          done < GithubRepositories/Repositories/Repositories.txt
+        shell: bash
+
+      - name: Bazel Test
+        run: |
+          # Run Bazel tests for the built binaries or any specific tests
+          bazel test //...  # Adjust this command according to your specific test targets
+          
+          # Error handling and debugging
+          if [ $? -ne 0 ]; then
+            echo "Bazel test failed"
+            # Add more error handling or debugging steps as needed
+          fi
         shell: bash
 
       - name: Deploy to GitHub Pages
@@ -53,4 +73,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./Github\ Release/Artifacts/Artifacts@v1.0.0 # Path to artifacts for GitHub Release
-
